@@ -1,0 +1,36 @@
+private void searchRoute(TMapPoint start, TMapPoint end){  //시작지점과 종료지점사이의 거리를 빨간줄로 경로표시 해주는 메소드
+        TMapData data = new TMapData();
+        data.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH,start, end, new TMapData.FindPathDataListenerCallback() {
+            @Override
+            public void onFindPathData(final TMapPolyLine path) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        path.setLineWidth(10);  //선 두께
+                        path.setLineColor(Color.RED); //선 색깔
+                        mapView.addTMapPath(path); //지도에 선 표시
+
+                    }
+                });
+            }
+
+        });
+        data.findPathDataAllType(TMapData.TMapPathType.PEDESTRIAN_PATH,start,end,new TMapData.FindPathDataAllListenerCallback(){
+            @Override
+            public void onFindPathDataAll(Document document) {
+                Element root=document.getDocumentElement();
+                NodeList nodeListPlacemark=root.getElementsByTagName("Document");
+                for(int i=0;i<nodeListPlacemark.getLength();i++){
+                    NodeList nodeListPlacemarkItem=nodeListPlacemark.item(i).getChildNodes();
+                    for(int j=0;j<nodeListPlacemarkItem.getLength();j++){
+                        if(nodeListPlacemarkItem.item(j).getNodeName().equals("tmap:totalDistance")){
+                            Log.d("dis",nodeListPlacemarkItem.item(j).getTextContent().trim());
+                        }
+                        if(nodeListPlacemarkItem.item(j).getNodeName().equals("tmap:totalTime")){
+                            Log.d("time",nodeListPlacemarkItem.item(j).getTextContent().trim());
+                        }
+                    }
+                }
+            }
+        });
+    }

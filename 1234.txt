@@ -1,0 +1,15 @@
+클럽리스트 아이템.xml에 아이디 추가
+어뎁터에 소스 추가
+LinearLayout cmdArea=(LinearLayout)view.findViewById(R.id.cmdArea);
+        cmdArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(),sample.get(position).getStrTitle(),Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(v.getContext(),ClubContent.class);
+                intent.putExtra("title1",sample.get(position).getStrTitle());
+                intent.putExtra("size1",sample.get(position).getStrSize());
+                intent.putExtra("loc1",sample.get(position).getStrLoc());
+                intent.putExtra("con1",sample.get(position).getStrCon());
+                mContext.startActivity(intent);
+            }
+        });
