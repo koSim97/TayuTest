@@ -1,0 +1,101 @@
+ public void weatherRun(double x,double y){
+        Retrofit client=new Retrofit.Builder().baseUrl("http://api.openweathermap.org")
+                .addConverterFactory(GsonConverterFactory.create()).build();
+       ApiInterface service=client.create(ApiInterface.class);
+       Call<WeatherTest> call=service.getWeather("b0ea95fa326c0d43e5c822aff3c99947",Double.valueOf(stX),Double.valueOf(stY));
+       call.enqueue(new Callback<WeatherTest>() {
+           @Override
+           public void onResponse(Call<WeatherTest> call, Response<WeatherTest> response) {
+               if(response.isSuccessful()){
+                   WeatherTest repo=response.body();
+                   Log.d("tag","wweeee");
+                   List<Weather>weathers=repo.getWeather();
+                   Log.d("ttt",""+weathers.get(0).getIcon());
+                   icon=weathers.get(0).getIcon();
+                    wtemp.setText(String.valueOf(repo.getMain().getTemp()-273.15));
+                    whumi.setText(String.valueOf(repo.getMain().getHumidity()));
+                    wtemax.setText(String.valueOf(repo.getMain().getTempMax()-273.15));
+                    wtemin.setText(String.valueOf(repo.getMain().getTempMin()-273.15));
+                   handler=new Handler();
+                   Thread t=new Thread(new Runnable() {
+                       @Override
+                       public void run() {
+                           try {
+                               URL url=new URL("http://openweathermap.org/img/w/"+icon+".png");
+                               InputStream is=url.openStream();
+                               final Bitmap bitmap=BitmapFactory.decodeStream(is);
+                               handler.post(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       wtIcon.setImageBitmap(bitmap);
+                                       Log.d("test","suss");
+                                   }
+                               });
+                           } catch (MalformedURLException e) {
+                               e.printStackTrace();
+                           } catch (IOException e) {
+                               e.printStackTrace();
+                           }
+                       }
+                   });
+                   t.start();
+               }else{
+               }
+           }
+           @Override
+           public void onFailure(Call<WeatherTest> call, Throwable t) {
+               Log.d("tag","wwwwwwww");
+           }
+       });
+       Call<Forecast> call1=service.getForecast("b0ea95fa326c0d43e5c822aff3c99947",Double.valueOf(stX),Double.valueOf(stY));
+       call1.enqueue(new Callback<Forecast>() {
+           @Override
+           public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+               if(response.isSuccessful()){
+                   Forecast repo1=response.body();
+                   final List<List1>list1s=repo1.getList();
+                   date1.setText(""+list1s.get(0).getDt_txt());
+                   wtemp1.setText(String.valueOf(Math.round(list1s.get(0).getMain().getTemp()-273.15)*10/10.0));
+                   date2.setText(""+list1s.get(1).getDt_txt());
+                   wtemp2.setText(String.valueOf(Math.round(list1s.get(1).getMain().getTemp()-273.15)*10/10.0));
+                   handler=new Handler();
+                   Thread t=new Thread(new Runnable() {
+                       @Override
+                       public void run() {
+                           try {
+                               URL url=new URL("http://openweathermap.org/img/w/"+list1s.get(0).getWeather().get(0).getIcon()+".png");
+                               InputStream is=url.openStream();
+                               final Bitmap bitmap=BitmapFactory.decodeStream(is);
+                               handler.post(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       wtIcon1.setImageBitmap(bitmap);
+                                   }
+                               });
+                               URL url1=new URL("http://openweathermap.org/img/w/"+list1s.get(1).getWeather().get(0).getIcon()+".png");
+                               InputStream is1=url1.openStream();
+                               final Bitmap bitmap1=BitmapFactory.decodeStream(is1);
+                               handler.post(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       wtIcon2.setImageBitmap(bitmap1);
+                                   }
+                               });
+                           } catch (MalformedURLException e) {
+                               e.printStackTrace();
+                           } catch (IOException e) {
+                               e.printStackTrace();
+                           }
+                       }
+                   });
+                   t.start();
+               }
+           }
+
+           @Override
+           public void onFailure(Call<Forecast> call, Throwable t) {
+
+           }
+       });
+
+    }
